@@ -9,7 +9,6 @@ databaseChangeLog:
               - column:
                   name: guid
                   type: uuid
-                  defaultValueComputed: uuid_generate_v4()
                   constraints:
                     primaryKey: true
                     nullable: false
@@ -39,7 +38,6 @@ databaseChangeLog:
               - column:
                   name: guid
                   type: uuid
-                  defaultValueComputed: uuid_generate_v4()
                   constraints:
                     primaryKey: true
                     nullable: false
