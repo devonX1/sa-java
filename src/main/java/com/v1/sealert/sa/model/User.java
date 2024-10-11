@@ -1,47 +1,39 @@
 package com.v1.sealert.sa.model;
 
+import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
-
+@Entity
+@Data
 @AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
+@Table(name = "\"user\"")
 public class User {
-    private UUID id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID guid;
     private String name;
     private String chatId;
-    private LocalDateTime createAt;
-
-    public UUID getId() {
-        return id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getChatId() {
-        return chatId;
-    }
-
-    public LocalDateTime getCreateAt() {
-        return createAt;
-    }
+    private LocalDateTime dateCreate;
 
     @Override
     public String toString() {
         return "User{" +
-                "id=" + id +
+                "id=" + guid +
                 ", name='" + name + '\'' +
                 ", chatId='" + chatId + '\'' +
-                ", createAt=" + createAt +
+                ", createAt=" + dateCreate +
                 '}';
     }
     public User(String name, String chatId) {
-        this.id = UUID.randomUUID();
+        this.guid = UUID.randomUUID();
         this.name = name;
         this.chatId = chatId;
-        this.createAt = LocalDateTime.now();
+        this.dateCreate = LocalDateTime.now();
     }
 }
