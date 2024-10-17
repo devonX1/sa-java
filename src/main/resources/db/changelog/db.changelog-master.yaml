@@ -129,16 +129,16 @@ databaseChangeLog:
                   constraints:
                     nullable: false
         - addForeignKeyConstraint:
-            baseColumnName: user_guid
+            baseColumnNames: user_guid
             baseTableName: user_district
             constraintName: fk_user_districts_user_guid
             referencedColumnNames: guid
             referencedTableName: user
         - addForeignKeyConstraint:
-            baseColumnName: district_guid
+            baseColumnNames: district_guid
             baseTableName: user_district
             constraintName: fk_user_districts_district_guid
-            referencedColumnName: guid
+            referencedColumnNames: guid
             referencedTableName: district
 
 
