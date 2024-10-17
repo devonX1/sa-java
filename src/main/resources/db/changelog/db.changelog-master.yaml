@@ -90,6 +90,57 @@ databaseChangeLog:
             tableName: notification
             columnName: street
             newDataType: TEXT
+  - changeSet:
+      id: 5
+      author: devon
+      changes:
+        - createTable:
+            tableName: district
+            columns:
+              - column:
+                  name: guid
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(255)
+              - column:
+                  name: date_create
+                  type: timestamp
+                  defaultValueComputed: now()
+        - createTable:
+            tableName: user_district
+            columns:
+              - column:
+                  name: guid
+                  type: uuid
+                  constraints: true
+                  nullable: false
+              - column:
+                  name: user_guid
+                  type: uuid
+                  constraints:
+                    nullable: false
+              - column:
+                  name: district_guid
+                  type: uuid
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseColumnName: user_guid
+            baseTableName: user_district
+            constraintName: fk_user_districts_user_guid
+            referencedColumnNames: guid
+            referencedTableName: user
+        - addForeignKeyConstraint:
+            baseColumnName: district_guid
+            baseTableName: user_district
+            constraintName: fk_user_districts_district_guid
+            referencedColumnName: guid
+            referencedTableName: district
+
 
 
 
