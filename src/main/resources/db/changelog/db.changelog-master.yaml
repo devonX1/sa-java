@@ -116,8 +116,8 @@ databaseChangeLog:
               - column:
                   name: guid
                   type: uuid
-                  constraints: true
-                  nullable: false
+                  constraints:
+                    nullable: false
               - column:
                   name: user_guid
                   type: uuid
