@@ -140,6 +140,42 @@ databaseChangeLog:
             constraintName: fk_user_districts_district_guid
             referencedColumnNames: guid
             referencedTableName: district
+  - changeSet:
+      id: 6
+      author: devon
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: user_district
+            constraintName: fk_user_districts_user_guid
+        - addForeignKeyConstraint:
+            baseColumnNames: user_guid
+            baseTableName: user_district
+            constraintName: fk_user_districts_user_guid
+            referencedColumnNames: guid
+            referencedTableName: user
+            onDelete: CASCADE
+  - changeSet:
+      id: 7
+      author: devon
+      changes:
+        addPrimaryKey:
+          columnNames: guid
+          constraintName: pk_user_district
+          tableName: user_district
+  - changeSet:
+      id: 8
+      author: devon
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: user_district
+            constraintName: fk_user_districts_district_guid
+        - addForeignKeyConstraint:
+            baseColumnNames: district_guid
+            baseTableName: user_district
+            constraintName: fk_user_districts_district_guid
+            referencedColumnNames: guid
+            referencedTableName: district
+            onDelete: CASCADE
 
 
 

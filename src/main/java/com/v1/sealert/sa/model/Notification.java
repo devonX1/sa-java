@@ -27,18 +27,12 @@ public class Notification {
     private LocalDate notificationDate;
     private LocalDateTime dateCreate;
 
-    public Notification(String branch, String town, String street, String notificationPeriod, String notificationDate) {
+    public Notification(String branch, String town, String street, String notificationPeriod, LocalDate notificationDate) {
         this.branch = branch;
         this.town = town;
         this.street = street;
         this.notificationPeriod = notificationPeriod;
-        this.notificationDate = stringToLocalDateTime(notificationDate);
+        this.notificationDate = notificationDate;
         this.dateCreate = LocalDateTime.now();
-    }
-
-    private LocalDate stringToLocalDateTime(String notificationDate) {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        return LocalDate.parse(notificationDate, dateTimeFormatter);
-
     }
 }

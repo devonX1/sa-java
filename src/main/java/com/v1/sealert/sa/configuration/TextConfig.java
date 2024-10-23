@@ -18,4 +18,12 @@ public class TextConfig {
     private String notification;
     @Value("${spring.text.info}")
     private String info;
+    @Value("${spring.text.district-subscription}")
+    private String districtSubscription;
+    @Value("${spring.text.get-district}")
+    private String getDistricts;
+    @Value("${spring.text.delete-district}")
+    private String deleteDistrict;
+    @Value("${spring.text.bye}")
+    private String bye;
 }

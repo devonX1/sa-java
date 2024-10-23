@@ -47,7 +47,10 @@ public class Telegram {
         botCommandList.add(new BotCommand("/start", "Start the bot"));
         botCommandList.add(new BotCommand("/get", "Get the notifications"));
         botCommandList.add(new BotCommand("/info", "Get the information about the bot"));
-        botCommandList.add(new BotCommand("/cancel", "Сancel subscription"));
+        botCommandList.add(new BotCommand("/cancel", "Сancel subscriptions"));
+        botCommandList.add(new BotCommand("/delete_district", "Delete distrirct subscription"));
+        botCommandList.add(new BotCommand("/add_district", "Введите команду /add_district, затем укажите один или несколько регионов через запятую, чтобы получать по ним уведомления.\n"));
+        botCommandList.add(new BotCommand("/get_districts", "Get the districts"));
         SetMyCommands setMyCommands = new SetMyCommands();
         setMyCommands.setCommands(botCommandList);
         return setMyCommands;

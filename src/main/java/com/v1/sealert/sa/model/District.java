@@ -12,30 +12,29 @@ import java.util.*;
 @Entity
 @Data
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
-@Table(name = "\"user\"")
-public class User {
+@NoArgsConstructor
+public class District {
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID guid;
     private String name;
-    private String chatId;
     private LocalDateTime dateCreate;
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
+    @OneToMany(mappedBy = "district", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UserDistrict> userDistrict = new ArrayList<>();
+
+    public District(String name) {
+        this.guid = UUID.randomUUID();
+        this.name = name;
+        dateCreate = LocalDateTime.now();
+    }
 
     @Override
     public String toString() {
-        return "User{" +
-                "id=" + guid +
+        return "District{" +
+                "dateCreate=" + dateCreate +
                 ", name='" + name + '\'' +
-                ", chatId='" + chatId + '\'' +
-                ", createAt=" + dateCreate +
+                ", guid=" + guid +
                 '}';
-    }
-    public User(String name, String chatId) {
-        this.name = name;
-        this.chatId = chatId;
-        this.dateCreate = LocalDateTime.now();
     }
 }

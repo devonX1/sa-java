@@ -1,10 +1,7 @@
 package com.v1.sealert.sa.service;
 
 import com.v1.sealert.sa.configuration.TextConfig;
-import com.v1.sealert.sa.model.CallbackType;
-import com.v1.sealert.sa.model.Notification;
-import com.v1.sealert.sa.model.TextType;
-import com.v1.sealert.sa.model.User;
+import com.v1.sealert.sa.model.*;
 import com.v1.sealert.sa.util.NotificationFormatter;
 import com.v1.sealert.sa.util.Telegram;
 import lombok.Data;
@@ -12,12 +9,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
-import org.telegram.telegrambots.meta.api.methods.updatingmessages.EditMessageText;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.InlineKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
 import java.util.*;
@@ -32,6 +27,8 @@ public class TelegramLongPollingBotService extends TelegramLongPollingBot {
     UserService userService;
     @Autowired
     NotificationService notificationService;
+    @Autowired
+    DistrictService districtService;
 
 
     private SendMessage message;
@@ -68,6 +65,12 @@ public class TelegramLongPollingBotService extends TelegramLongPollingBot {
             info();
         } else if (TextType.CANCEL.getValue().equalsIgnoreCase(t)) {
             deleteUser();
+        } else if (t.startsWith(TextType.DISTRICT_CANCEL.getValue())) {
+            deleteDistrict(t);
+        } else if (t.startsWith(TextType.ADD_DISTRICT.getValue())) {
+            districtHandler(t);
+        } else if (TextType.GET_DISTRICTS.getValue().equalsIgnoreCase(t)) {
+            chooseDistrict();
         }
     }
 
@@ -75,21 +78,41 @@ public class TelegramLongPollingBotService extends TelegramLongPollingBot {
         String cbD = callbackData;
         if (CallbackType.YES.getValue().equalsIgnoreCase(cbD)) {
             addUser();
+            chooseDistrict();
         } else if (CallbackType.NOT.getValue().equalsIgnoreCase(cbD)) {
             bye();
         }
     }
-
+    private void districtHandler(String stringWithDisricts) {
+        message = new SendMessage();
+        message.enableMarkdownV2(true);
+        message.setChatId(chatId);
+        String districtName = stringWithDisricts.substring(13);
+        System.out.println(districtName);
+        if (districtName.contains(",")) {
+            List<String> districtNameList = districtService.makeDistrictNameListFromString(districtName);
+            for (String dName: districtNameList) {
+                userService.addUserDistrict(userName, dName);
+            }
+            message.setText(Telegram.escapeMarkdown(textConfig.getDistrictSubscription()));
+            send();
+        } else {
+            userService.addUserDistrict(userName, districtName.trim());
+            message.setText(Telegram.escapeMarkdown(textConfig.getDistrictSubscription()));
+            send();
+        }
+    }
     private void welcome(Long chatId) {
         message = new SendMessage();
         message.enableMarkdownV2(true);
         message.setChatId(chatId);
         message.setText(Telegram.escapeMarkdown(textConfig.getWelcome()));
-        InlineKeyboardMarkup inlineKeyboardMarkup = Telegram.createOneLineKeyboardMarkup(List.of("Да", "Нет"), List.of("YES", "NO"));
+        InlineKeyboardMarkup inlineKeyboardMarkup = Telegram.createOneLineKeyboardMarkup(List.of("Подписаться", "Нет"), List.of("YES", "NO"));
         message.setReplyMarkup(inlineKeyboardMarkup);
         messageId = send();
     }
     private void bye() {
+        deletePrevMessage(messageId);
         message = new SendMessage();
         message.enableMarkdownV2(true);
         message.setChatId(chatId);
@@ -103,6 +126,33 @@ public class TelegramLongPollingBotService extends TelegramLongPollingBot {
         message.setText(Telegram.escapeMarkdown(textConfig.getInfo()));
         send();
     }
+    private void chooseDistrict() {
+        message = new SendMessage();
+        message.enableMarkdownV2(true);
+        message.setChatId(chatId);
+        List<District> listDistrict = districtService.findAll();
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < listDistrict.size(); i++) {
+            stringBuilder.append(NotificationFormatter.upperFirstLetter(listDistrict.get(i).getName()));
+            if (!(i == listDistrict.size() - 1)) {
+                stringBuilder.append(", ");
+            }
+        }
+        stringBuilder.append("\n").append("\n");
+        stringBuilder.append(textConfig.getGetDistricts());
+        message.setText(Telegram.escapeMarkdown(stringBuilder.toString()));
+        send();
+    }
+    private void deleteDistrict(String stringWithDisricts) {
+        message = new SendMessage();
+        message.enableMarkdownV2(true);
+        message.setChatId(chatId);
+        String districtName = stringWithDisricts.substring(16);
+        System.out.println(districtName);
+        userService.deleteUserDistrict(userName, districtName.trim());
+        message.setText(Telegram.escapeMarkdown(textConfig.getDeleteDistrict()));
+        send();
+    }
 
     private void addUser() {
         deletePrevMessage(messageId);
@@ -114,8 +164,6 @@ public class TelegramLongPollingBotService extends TelegramLongPollingBot {
             send();
         } else {
             userService.addUser(userName, String.valueOf(chatId));
-            message.setText(Telegram.escapeMarkdown(textConfig.getNotification()));
-            send();
         }
     }
     private boolean userAlreadyAddedOrDeleted() {
@@ -123,34 +171,46 @@ public class TelegramLongPollingBotService extends TelegramLongPollingBot {
         return addedUser.isPresent();
     }
 
-
     private SendMessage deleteUser() {
         message = new SendMessage();
         message.enableMarkdownV2(true);
         message.setChatId(chatId);
         if (!userAlreadyAddedOrDeleted()) {
-            message.setText(Telegram.escapeMarkdown("Подписка была успешно удалена."));
+            message.setText(Telegram.escapeMarkdown(textConfig.getBye()));
             send();
         } else {
             userService.deleteUser(userName);
-            message.setText(Telegram.escapeMarkdown("Подписка была успешно удалена."));
+            message.setText(Telegram.escapeMarkdown(textConfig.getBye()));
             send();
         }
-
-
         return null;
     }
-    private void getAllNotificationAfterDate() {
-        Map<String, Map<String, List<Notification>>> notificationMapMap = notificationService.getAllNotificationAfterDate();
-        for (Map.Entry<String, Map<String, List<Notification>>> entry : notificationMapMap.entrySet()) {
-            message = new SendMessage();
-            message.enableMarkdownV2(true);
-            message.setChatId(chatId);
-            message.setText(NotificationFormatter.messageFormat(entry.getKey(), entry.getValue()));
-            send();
-        }
 
+    private void getAllNotificationAfterDate() {
+        User user = userService.findByName(userName).get();
+        message = new SendMessage();
+        message.enableMarkdownV2(true);
+        message.setChatId(chatId);
+        List<District> districtList = userService.getDistrictList(user.getUserDistrict());
+        List<Notification> notificationList = notificationService.findNotificationsByDistricts(districtList);
+        StringBuilder stringBuilder = new StringBuilder();
+        for (Notification n: notificationList) {
+            String notificationString = Telegram.escapeMarkdown(NotificationFormatter.notificationFormat(n));
+            stringBuilder.append(notificationString).append("\n");
+        }
+        String fullTextForMessage = stringBuilder.toString();
+        if (fullTextForMessage.length() <= NotificationFormatter.TELEGRAM_MESSAGE_LIMIT) {
+            message.setText(fullTextForMessage);
+            send();
+        } else {
+            List<String> textParts = NotificationFormatter.splitMessage(fullTextForMessage, NotificationFormatter.TELEGRAM_MESSAGE_LIMIT);
+            for (String part: textParts) {
+                message.setText(fullTextForMessage);
+                send();
+            }
+        }
     }
+
     private int send() {
         try {
             Message welcomeMessage = execute(message);
@@ -181,7 +241,6 @@ public class TelegramLongPollingBotService extends TelegramLongPollingBot {
     public String getBotUsername() {
         return botName;
     }
-
     /**
      * Returns the token of the bot to be able to perform Telegram Api Requests
      *
@@ -191,5 +250,4 @@ public class TelegramLongPollingBotService extends TelegramLongPollingBot {
     public String getBotToken() {
         return token;
     }
-
 }

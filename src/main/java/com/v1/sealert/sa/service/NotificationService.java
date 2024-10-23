@@ -1,54 +1,88 @@
 package com.v1.sealert.sa.service;
 
 import com.v1.sealert.sa.DTO.NotificationDTO;
+import com.v1.sealert.sa.model.District;
 import com.v1.sealert.sa.model.Notification;
+import com.v1.sealert.sa.model.User;
 import com.v1.sealert.sa.repo.NotificationRepository;
+import com.v1.sealert.sa.repo.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class NotificationService {
 
     @Autowired
     private NotificationRepository notificationRepository;
+    @Autowired
+    private UserService userService;
+
     private final LocalDate localDate = LocalDate.now(ZoneId.of("Europe/Belgrade"));
 
+    //Из карты с юзерами и дистриктами делаем карту с Юзерами и нотификациями по их дистриктам
+    @Transactional
+    public Map<User, List<Notification>> getAllNotificationByUsers(Map<User, List<District>> userDistrictsMap) {
+        Map<User, List<Notification>> userNotificationListMap = new HashMap<>();
+        for (Map.Entry<User, List<District>> entry: userDistrictsMap.entrySet()) {
+            List<Notification> notificationList = findNotificationsByDistricts(entry.getValue());
+            userNotificationListMap.put(entry.getKey(), notificationList);
+        }
+        //System.out.println("NotificationRepository.getAllNotificationByUsers(): user->notif maps below:");
+        //System.out.println(userNotificationListMap);
+        return userNotificationListMap;
+    }
+    //Из списка дистриктов возвращаем список нотификаций
+    public List<Notification> findNotificationsByDistricts(List<District> districtList) {
+        List<Notification> notificationList = new ArrayList<>();
+        for (District d: districtList) {
+            //List<Notification> notificationPartList = notificationRepository.findByTownAndNotificationDateGreaterThanEqual(d.getName(), localDate);
+            //System.out.println("ВНУТРИ ЦИКЛА ПРОВЕРЯЕМ КАКОЙ ДОСТАЛИ СПИСОК:");
+            //System.out.println("НО СНАЧАЛА САЙЗ:  " + notificationPartList.size());
+            //System.out.println(notificationPartList);
+            notificationList.addAll(notificationRepository.findByTownAndNotificationDateGreaterThanEqual(d.getName(), localDate));
+        }
+        //System.out.println("NotificationService.findNotificationsByDistricts*(): Notification list below: ");
+        //System.out.println("List SIZE ======: " + notificationList.size());
+        //System.out.println(notificationList);
+        return notificationList;
+    }
     public List<Notification> getAllNotification() {
         return (List<Notification>) notificationRepository.findAll();
     }
-    public Notification addNotification(String branch, String town, String street, String description, String notificationTime) {
+    @Transactional
+    public Notification addNotification(String branch, String town, String street, String description, LocalDate notificationTime) {
         Notification notification = new Notification(branch, town, street, description, notificationTime);
         return notificationRepository.save(notification);
-    }
-    public Map<String, Map<String, List<Notification>>> getAllNotificationAfterDate() {
-        System.out.println("NotificationService.getAllNotificationAfterDate(): starting");
-        List<Notification> notificationList = notificationRepository.getAllNotificationAfterDate(localDate);
-        Map<String, List <Notification>> notificationMapList = notificationListToMapList(notificationList);
-        Map<String, Map<String, List<Notification>>> notificationMapMap = notificationListToMapMap(notificationMapList);
-        return notificationMapMap;
     }
     public List<Notification> addAllNotification(List<NotificationDTO> notificationDTOList, String notificationDate) {
         List<Notification> notificationList = notificationsDTOtoNotification(notificationDTOList, notificationDate);
         return  (List<Notification>) notificationRepository.saveAll(notificationList);
     }
-
+    public boolean isPresent(String street, String time, LocalDate ldate) {
+        Optional<Notification> notificationOptional = notificationRepository.findByStreetAndNotificationPeriodAndNotificationDate(street, time, ldate);
+        return notificationOptional.isPresent();
+    }
     private List<Notification> notificationsDTOtoNotification(List<NotificationDTO> notificationDTOList, String notificationDate) {
-        String nStringDate = makeDate(notificationDate);
+        LocalDate nDate = makeDateV2(notificationDate);
         List<Notification> notificationList = new ArrayList<>();
         for (NotificationDTO notificationDTO : notificationDTOList) {
-            notificationList.add(new Notification(notificationDTO.getBranch(), notificationDTO.getTown(), notificationDTO.getStreet(), notificationDTO.getTime(), nStringDate));
+            String street = notificationDTO.getStreet();
+            String time = notificationDTO.getTime();
+            if (isPresent(street, time, nDate)) {
+                System.out.println("NotificationService.notificationsDTOtoNotification(): Notification with street: >>" + street + " already added to db");
+                continue;
+            }
+            notificationList.add(new Notification(notificationDTO.getBranch(), notificationDTO.getTown().toLowerCase(), notificationDTO.getStreet(), notificationDTO.getTime(), nDate));
         }
         return notificationList;
     }
@@ -59,6 +93,13 @@ public class NotificationService {
         LocalDate nDate = LocalDate.parse(notificationDate, dateFormatterInput);
         String nStringDate = nDate.format(dateFormatterOutput);
         return nStringDate;
+    }
+    private LocalDate makeDateV2(String notificationDate) {
+        DateTimeFormatter dateFormatterInput = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+        DateTimeFormatter dateFormatterOutput = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate nDate = LocalDate.parse(notificationDate, dateFormatterInput);
+        String nStringDate = nDate.format(dateFormatterOutput);
+        return LocalDate.parse(nStringDate, dateFormatterOutput);
     }
     //Из списка уведомлений создаем карту, где ключем является город, а значением список уведомлений для этого города
     public Map<String, List <Notification>> notificationListToMapList(List<Notification> notificationList) {

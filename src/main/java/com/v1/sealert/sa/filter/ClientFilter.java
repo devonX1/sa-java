@@ -32,7 +32,6 @@ public class ClientFilter implements Filter {
             }
         }
         httpServletResponse.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        //throw new AccessDeniedException("Access denied");
     }
 
     @Override

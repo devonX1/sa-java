@@ -12,6 +12,4 @@ public class DateDTO {
 
     @JsonProperty("notifications")
     private List<NotificationDTO> notifications;
-    //private NotificationDTO[] notifications;
-
 }

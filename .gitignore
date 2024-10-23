@@ -35,3 +35,6 @@ build/
 
 # Приложение
 application.yml
+application-test.yml
+
+/src/main/java/com/v1/sealert/sa/NonStatic.java
