@@ -1,9 +1,7 @@
-FROM openjdk:22-jdk
-
-WORKDIR /app
---Команда copy копирует и переименовывает файл
-COPY target/*.jar sa-0.0.1-SNAPSHOT.jar
-
-EXPOSE 8080
-
-ENTRYPOINT ["java", "-jar", "sa-0.0.1-SNAPSHOT.jar"]
+FROM amazoncorretto:21.0.5
+ARG JAR_FILE=target/*.jar
+RUN mkdir -p /serb-alert
+COPY ${JAR_FILE} /serb-alert/app.jar
+COPY ./entrypoint.sh /serb-alert/entrypoint.sh
+RUN chmod +x /serb-alert/entrypoint.sh
+CMD ["/serb-alert/entrypoint.sh"]

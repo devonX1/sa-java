@@ -21,7 +21,6 @@ import java.util.*;
 
 @Service
 public class NotificationService {
-
     @Autowired
     private NotificationRepository notificationRepository;
     @Autowired
@@ -45,10 +44,6 @@ public class NotificationService {
     public List<Notification> findNotificationsByDistricts(List<District> districtList) {
         List<Notification> notificationList = new ArrayList<>();
         for (District d: districtList) {
-            //List<Notification> notificationPartList = notificationRepository.findByTownAndNotificationDateGreaterThanEqual(d.getName(), localDate);
-            //System.out.println("ВНУТРИ ЦИКЛА ПРОВЕРЯЕМ КАКОЙ ДОСТАЛИ СПИСОК:");
-            //System.out.println("НО СНАЧАЛА САЙЗ:  " + notificationPartList.size());
-            //System.out.println(notificationPartList);
             notificationList.addAll(notificationRepository.findByTownAndNotificationDateGreaterThanEqual(d.getName(), localDate));
         }
         //System.out.println("NotificationService.findNotificationsByDistricts*(): Notification list below: ");
@@ -56,6 +51,7 @@ public class NotificationService {
         //System.out.println(notificationList);
         return notificationList;
     }
+
     public List<Notification> getAllNotification() {
         return (List<Notification>) notificationRepository.findAll();
     }
@@ -64,14 +60,17 @@ public class NotificationService {
         Notification notification = new Notification(branch, town, street, description, notificationTime);
         return notificationRepository.save(notification);
     }
+
     public List<Notification> addAllNotification(List<NotificationDTO> notificationDTOList, String notificationDate) {
         List<Notification> notificationList = notificationsDTOtoNotification(notificationDTOList, notificationDate);
         return  (List<Notification>) notificationRepository.saveAll(notificationList);
     }
+
     public boolean isPresent(String street, String time, LocalDate ldate) {
         Optional<Notification> notificationOptional = notificationRepository.findByStreetAndNotificationPeriodAndNotificationDate(street, time, ldate);
         return notificationOptional.isPresent();
     }
+
     private List<Notification> notificationsDTOtoNotification(List<NotificationDTO> notificationDTOList, String notificationDate) {
         LocalDate nDate = makeDateV2(notificationDate);
         List<Notification> notificationList = new ArrayList<>();
@@ -79,7 +78,7 @@ public class NotificationService {
             String street = notificationDTO.getStreet();
             String time = notificationDTO.getTime();
             if (isPresent(street, time, nDate)) {
-                System.out.println("NotificationService.notificationsDTOtoNotification(): Notification with street: >>" + street + " already added to db");
+                System.out.println("NotificationService.notificationsDTOtoNotification(): Notification with street: >>" + street + " has already been added to the database");
                 continue;
             }
             notificationList.add(new Notification(notificationDTO.getBranch(), notificationDTO.getTown().toLowerCase(), notificationDTO.getStreet(), notificationDTO.getTime(), nDate));
@@ -94,6 +93,7 @@ public class NotificationService {
         String nStringDate = nDate.format(dateFormatterOutput);
         return nStringDate;
     }
+
     private LocalDate makeDateV2(String notificationDate) {
         DateTimeFormatter dateFormatterInput = DateTimeFormatter.ofPattern("dd.MM.yyyy");
         DateTimeFormatter dateFormatterOutput = DateTimeFormatter.ofPattern("yyyy-MM-dd");

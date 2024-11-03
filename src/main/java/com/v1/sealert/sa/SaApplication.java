@@ -11,13 +11,6 @@
 
 		public static void main(String[] args) {
 			ApplicationContext context = SpringApplication.run(SaApplication.class, args);
-
-			NonStatic n = context.getBean(NonStatic.class);
-			//n.manyToManyTest();
-			//n.findAllWithDistrictsTest();
-			//n.getUserWithNotificationTest();
-			//n.getOneUserDistrictTest();
-			//n.userDistrictDeleteTest();
 		}
 
 	}

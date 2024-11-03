@@ -16,7 +16,6 @@ public interface UserDistrictRepository extends JpaRepository<UserDistrict, UUID
 
     Optional<UserDistrict> findByUserAndDistrict(User u, District d);
 
-
     @Modifying
     @Query("DELETE FROM UserDistrict ud WHERE ud.user.guid = :userId AND ud.district.guid = :districtId")
     void deleteUserDistrictByUserAndDistrict(@Param("userId") UUID userId, @Param("districtId") UUID districtId);

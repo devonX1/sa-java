@@ -45,6 +45,7 @@ public class UserService {
     public void deleteUser(String name) {
         userRepository.deleteById(userRepository.findByName(name).get().getGuid());
     }
+
     public Optional<User> findByName(String name) {
         Optional<User> r = userRepository.findByName(name);
         return r;
@@ -59,7 +60,7 @@ public class UserService {
             //System.out.println(districtList);
             userDistrictsMap.put(u, districtList);
         }
-        System.out.println("UserService.getUserWithDistricts(): UserDistricsMap below:");
+        System.out.println("UserService.getUserWithDistricts(): UserDistrictsMap below:");
         System.out.println(userDistrictsMap);
         return userDistrictsMap;
     }

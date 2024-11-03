@@ -18,7 +18,6 @@ import java.util.Map;
 @Data
 @Service
 public class HttpService {
-
     @Autowired
     NotificationService notificationService;
     @Autowired
@@ -30,7 +29,7 @@ public class HttpService {
     private OkHttpClient okHttpClient = new OkHttpClient();
     private ObjectMapper objectMapper = new ObjectMapper();
 
-    //Каждый день в 10 утра по часовому поясу белграда
+    //Каждый день в 10 утра по часовому поясу белграда 0 0 10 * * *
     @Scheduled(cron = "0 0 10 * * *", zone = "Europe/Belgrade")
     public void sendNotifications() throws JsonProcessingException {
        Map<User, List<Notification>> userNotificationListMap = notificationService.getAllNotificationByUsers(userService.getUserWithDistricts());
@@ -52,16 +51,19 @@ public class HttpService {
            }
        }
     }
+
     private String makeTextFromNotification(List<Notification> notificationList) {
         String fullNotificationsText = NotificationFormatter.messageFormat(notificationList);
         return fullNotificationsText;
     }
+
     private TelegramMessageDTO prepareDTO(String text, String chatId) {
         TelegramMessageDTO message = new TelegramMessageDTO(chatId, text, "MarkdownV2");
         return message;
     }
+
     private String post(String url, String json) {
-        System.out.println("HttpService.post(): POST REQUSET METHOD STARTING");
+        System.out.println("HttpService.post(): POST REQUEST METHOD STARTING");
         RequestBody body = RequestBody.create(json, JSON);
         Request request = new Request.Builder()
                 .url(url)

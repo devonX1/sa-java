@@ -2,7 +2,6 @@ package com.v1.sealert.sa;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.v1.sealert.sa.DTO.TelegramMessageDTO;
-import com.v1.sealert.sa.configuration.JdbcConfig;
 import com.v1.sealert.sa.configuration.TextConfig;
 import com.v1.sealert.sa.model.District;
 import com.v1.sealert.sa.model.Notification;
@@ -26,6 +25,8 @@ import java.util.*;
 
 @Component
 public class NonStatic {
+    @Value("${spring.datasource.url}")
+    private String url;
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -110,5 +111,8 @@ public class NonStatic {
     void userDistrictDeleteTest() {
         userDistrictRepository.deleteUserDistrictByUserAndDistrict(UUID.fromString("0c546354-21bb-4ba9-8736-cc02f6d3a977"),
                 UUID.fromString("bbf24aa5-66a2-493e-828d-dd5bcc6cdc5c"));
+    }
+    void forHerokuDataBASE_URL_test() {
+        System.out.println("DATABASE_URL for heroku : " + url);
     }
 }

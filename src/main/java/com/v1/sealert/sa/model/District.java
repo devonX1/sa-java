@@ -14,7 +14,6 @@ import java.util.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class District {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID guid;

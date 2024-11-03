@@ -24,6 +24,12 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<UserDistrict> userDistrict = new ArrayList<>();
 
+    public User(String name, String chatId) {
+        this.name = name;
+        this.chatId = chatId;
+        this.dateCreate = LocalDateTime.now();
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -32,10 +38,5 @@ public class User {
                 ", chatId='" + chatId + '\'' +
                 ", createAt=" + dateCreate +
                 '}';
-    }
-    public User(String name, String chatId) {
-        this.name = name;
-        this.chatId = chatId;
-        this.dateCreate = LocalDateTime.now();
     }
 }

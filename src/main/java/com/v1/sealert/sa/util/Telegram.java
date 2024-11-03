@@ -39,9 +39,11 @@ public class Telegram {
         inlineKeyboardMarkup.setKeyboard(rowsInKeyboard);
         return inlineKeyboardMarkup;
     }
+
     public static String getEmojiByKey(String key) {
         return Emoji.getInstance().getEmojiMap().get(key);
     }
+
     public static SetMyCommands setCommands() {
         List<BotCommand> botCommandList = new ArrayList<>();
         botCommandList.add(new BotCommand("/start", "Start the bot"));
@@ -55,9 +57,6 @@ public class Telegram {
         setMyCommands.setCommands(botCommandList);
         return setMyCommands;
     }
-
-    //я пишу на новой клавиатуре привет ввсем
-
 
     public static String escapeMarkdown(String text) {
         return text

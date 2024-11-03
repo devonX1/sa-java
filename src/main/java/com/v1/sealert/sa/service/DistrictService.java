@@ -19,6 +19,7 @@ public class DistrictService {
         Optional<District> d = districtRepository.findByName(name.toLowerCase());
         return d;
     }
+
     @Transactional
     public void addAllDistricts(List<Notification> notificationList) {
         Set<String> DistinctDistrictName = new HashSet<>();
@@ -34,13 +35,16 @@ public class DistrictService {
         System.out.println(DistinctDistrictName);
         districtRepository.saveAll(createDistinctDistrictList(DistinctDistrictName));
     }
+
     public boolean isPresent(String name) {
         Optional<District> districtOptional = districtRepository.findByName(name);
        return districtOptional.isPresent();
     }
+
     public List<District> findAll() {
        return districtRepository.findAll();
     }
+
     public List<String> makeDistrictNameListFromString(String text) {
         List<String> districtNameList = new ArrayList<>();
         String[] distirctArray = text.split(",");
@@ -58,5 +62,4 @@ public class DistrictService {
         }
         return districtList;
     }
-
 }

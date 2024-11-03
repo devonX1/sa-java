@@ -7,5 +7,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface DistrictRepository extends JpaRepository<District, UUID> {
+
     public Optional<District> findByName(String name);
 }

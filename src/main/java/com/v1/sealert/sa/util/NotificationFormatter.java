@@ -8,9 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 public class NotificationFormatter {
-
     public static final int TELEGRAM_MESSAGE_LIMIT = 4090;
-
     private static Map<String, String> emojiMap = Emoji.getInstance().getEmojiMap();
 
     public static String messageFormat(List<Notification> notificationList) {
@@ -35,6 +33,7 @@ public class NotificationFormatter {
         stringBuilder.append("\n");
         return stringBuilder.toString();
     }
+
     public static List<String> splitMessage(String text, int limit) {
         System.out.println("HttpService : splitMessage(): starting");
         List<String> parts = new ArrayList<>();

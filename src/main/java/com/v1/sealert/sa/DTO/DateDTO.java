@@ -9,7 +9,6 @@ import java.util.List;
 public class DateDTO {
     @JsonProperty("notificationDate")
     private String notificationDate;
-
     @JsonProperty("notifications")
     private List<NotificationDTO> notifications;
 }

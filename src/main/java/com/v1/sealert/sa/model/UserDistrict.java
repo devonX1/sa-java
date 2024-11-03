@@ -16,11 +16,9 @@ public class UserDistrict {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID guid;
-
     @ManyToOne
     @JoinColumn(name = "user_guid")
     private User user;
-
     @ManyToOne
     @JoinColumn(name = "district_guid")
     private District district;

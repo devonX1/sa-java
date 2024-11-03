@@ -1,0 +1,24 @@
+server:
+  port:
+spring:
+  datasource:
+    url:
+    username:
+    password:
+    driver-class-name:
+  liquibase:
+    change-log:
+  telegram:
+    bot-name:
+    token:
+    url:
+  text:
+    welcome:
+    notification:
+    get-district:
+    district-subscription:
+    info:
+    delete-district:
+    bye:
+  rest-client:
+    auth-header:

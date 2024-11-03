@@ -7,6 +7,7 @@ import com.v1.sealert.sa.util.Telegram;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.updatingmessages.DeleteMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
@@ -29,7 +30,6 @@ public class TelegramLongPollingBotService extends TelegramLongPollingBot {
     NotificationService notificationService;
     @Autowired
     DistrictService districtService;
-
 
     private SendMessage message;
     private Long chatId;
@@ -70,6 +70,7 @@ public class TelegramLongPollingBotService extends TelegramLongPollingBot {
         } else if (t.startsWith(TextType.ADD_DISTRICT.getValue())) {
             districtHandler(t);
         } else if (TextType.GET_DISTRICTS.getValue().equalsIgnoreCase(t)) {
+            System.out.println("TelegramLongPollingBotService.textHandler GET_DISTRICTS-DEBUG");
             chooseDistrict();
         }
     }
@@ -83,6 +84,7 @@ public class TelegramLongPollingBotService extends TelegramLongPollingBot {
             bye();
         }
     }
+
     private void districtHandler(String stringWithDisricts) {
         message = new SendMessage();
         message.enableMarkdownV2(true);
@@ -102,6 +104,7 @@ public class TelegramLongPollingBotService extends TelegramLongPollingBot {
             send();
         }
     }
+
     private void welcome(Long chatId) {
         message = new SendMessage();
         message.enableMarkdownV2(true);
@@ -111,6 +114,7 @@ public class TelegramLongPollingBotService extends TelegramLongPollingBot {
         message.setReplyMarkup(inlineKeyboardMarkup);
         messageId = send();
     }
+
     private void bye() {
         deletePrevMessage(messageId);
         message = new SendMessage();
@@ -119,6 +123,7 @@ public class TelegramLongPollingBotService extends TelegramLongPollingBot {
         message.setText(Telegram.escapeMarkdown("Хорошего дня!"));
         send();
     }
+
     private void info() {
         message = new SendMessage();
         message.enableMarkdownV2(true);
@@ -126,6 +131,7 @@ public class TelegramLongPollingBotService extends TelegramLongPollingBot {
         message.setText(Telegram.escapeMarkdown(textConfig.getInfo()));
         send();
     }
+
     private void chooseDistrict() {
         message = new SendMessage();
         message.enableMarkdownV2(true);
@@ -143,6 +149,7 @@ public class TelegramLongPollingBotService extends TelegramLongPollingBot {
         message.setText(Telegram.escapeMarkdown(stringBuilder.toString()));
         send();
     }
+
     private void deleteDistrict(String stringWithDisricts) {
         message = new SendMessage();
         message.enableMarkdownV2(true);
@@ -166,6 +173,7 @@ public class TelegramLongPollingBotService extends TelegramLongPollingBot {
             userService.addUser(userName, String.valueOf(chatId));
         }
     }
+
     private boolean userAlreadyAddedOrDeleted() {
         Optional<User> addedUser = userService.findByName(userName);
         return addedUser.isPresent();
@@ -219,6 +227,7 @@ public class TelegramLongPollingBotService extends TelegramLongPollingBot {
             throw new RuntimeException(e);
         }
     }
+
     private void deletePrevMessage(int messageId) {
         try {
             DeleteMessage deleteMessage = new DeleteMessage();

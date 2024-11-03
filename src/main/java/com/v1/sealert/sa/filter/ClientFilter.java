@@ -17,7 +17,6 @@ public class ClientFilter implements Filter {
     @Value("${spring.rest-client.auth-header}")
     private String authHeader;
 
-
     @Override
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain)
                                                                             throws IOException, ServletException {

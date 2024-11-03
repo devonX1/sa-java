@@ -13,5 +13,4 @@ public class NotificationDTO {
     private String time;
     @JsonProperty("street")
     private String street;
-
 }

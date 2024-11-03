@@ -16,7 +16,6 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
 public class Notification {
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID guid;
