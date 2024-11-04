@@ -30,7 +30,7 @@ public class HttpService {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     //Каждый день в 10 утра по часовому поясу белграда 0 0 10 * * *
-    @Scheduled(cron = "0 0 10 * * *", zone = "Europe/Belgrade")
+    @Scheduled(cron = "0 0 7 * * *", zone = "Europe/Belgrade")
     public void sendNotifications() throws JsonProcessingException {
        Map<User, List<Notification>> userNotificationListMap = notificationService.getAllNotificationByUsers(userService.getUserWithDistricts());
        for (Map.Entry<User, List<Notification>> entry: userNotificationListMap.entrySet()) {
