@@ -29,7 +29,7 @@ public class HttpService {
     private OkHttpClient okHttpClient = new OkHttpClient();
     private ObjectMapper objectMapper = new ObjectMapper();
 
-    //Каждый день в 10 утра по часовому поясу белграда 0 0 10 * * *
+    //new cont #5
     @Scheduled(cron = "0 0 7 * * *", zone = "Europe/Belgrade")
     public void sendNotifications() throws JsonProcessingException {
        Map<User, List<Notification>> userNotificationListMap = notificationService.getAllNotificationByUsers(userService.getUserWithDistricts());
