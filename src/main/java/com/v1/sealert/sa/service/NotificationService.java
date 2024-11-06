@@ -26,8 +26,6 @@ public class NotificationService {
     @Autowired
     private UserService userService;
 
-    private final LocalDate localDate = LocalDate.now(ZoneId.of("Europe/Belgrade"));
-
     //Из карты с юзерами и дистриктами делаем карту с Юзерами и нотификациями по их дистриктам
     @Transactional
     public Map<User, List<Notification>> getAllNotificationByUsers(Map<User, List<District>> userDistrictsMap) {
@@ -42,6 +40,7 @@ public class NotificationService {
     }
     //Из списка дистриктов возвращаем список нотификаций
     public List<Notification> findNotificationsByDistricts(List<District> districtList) {
+        LocalDate localDate = LocalDate.now(ZoneId.of("Europe/Belgrade"));
         List<Notification> notificationList = new ArrayList<>();
         for (District d: districtList) {
             notificationList.addAll(notificationRepository.findByTownAndNotificationDateGreaterThanEqual(d.getName(), localDate));
